@@ -23,7 +23,9 @@
 import sys
 
 def read_key(filename):
+    """Read the key matrix from the given file."""
     with open(filename, 'r') as file:
+        # Skip the first line
         file.readline()
         key = []
         for line in file:
@@ -31,16 +33,22 @@ def read_key(filename):
             key.append(row)
     return key
 
-def extract_letters(filename):
+def extract_letters(filename, key_size):
+    """Reads only the upper and lower case letters from the input file."""
     letters = []
     with open(filename, 'r') as file:
         for line in file:
             for char in line:
                 if char.isalpha():
-                    letters.append(char.lower())
+                    letters.append(char.lower())  # Convert uppercase to lowercase
+    # Check if padding is needed
+    padding_needed = len(letters) % key_size
+    if padding_needed:
+        letters.extend(['x'] * (key_size - padding_needed))
     return ''.join(letters)
 
 def matrix_multiply(matrix1, matrix2):
+    """Perform matrix multiplication."""
     result = []
     for i in range(len(matrix1)):
         row = []
@@ -53,6 +61,7 @@ def matrix_multiply(matrix1, matrix2):
     return result
 
 def hill_cipher_encrypt(key, plaintext):
+    """Encrypt plaintext using Hill cipher with the given key matrix."""
     key_size = len(key)
     ciphertext = ''
     for i in range(0, len(plaintext), key_size):
@@ -64,10 +73,12 @@ def hill_cipher_encrypt(key, plaintext):
     return ciphertext
 
 def output_ciphertext(ciphertext):
+    """Outputs the ciphertext to the screen in the specified format."""
     print("\nCiphertext:")
+    # Split ciphertext into rows of exactly 80 characters and add newline after each line
     for i in range(0, len(ciphertext), 80):
         print(ciphertext[i:i+80])
-    print()
+    print()  # Add newline after the ciphertext
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
@@ -77,20 +88,26 @@ if __name__ == "__main__":
     key_file = sys.argv[1]
     plaintext_file = sys.argv[2]
 
+    # Read key matrix and plaintext from files
     key = read_key(key_file)
-    plaintext = extract_letters(plaintext_file)
+    plaintext = extract_letters(plaintext_file, len(key))
 
+    # Output key matrix
     print("Key matrix:")
     for row in key:
         print(' '.join(map(str, row)))
 
+    # Output plaintext
     print("\nPlaintext:")
+    # Split plaintext into rows of exactly 80 characters and add newline after each line
     for i in range(0, len(plaintext), 80):
         print(plaintext[i:i+80])
-    print()
+    print()  # Add newline after the plaintext
 
+    # Perform Hill cipher encryption
     ciphertext = hill_cipher_encrypt(key, plaintext)
 
+    # Output ciphertext with preceding and following newline
     output_ciphertext(ciphertext)
 
 """
